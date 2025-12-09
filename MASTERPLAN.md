@@ -290,10 +290,10 @@ The backend is a single Node.js application containing:
   - Leaderboard data
   - Analytics data
 
-**Caching & Session Management (V2+):**
+**Caching & Session Management (V2+ for scaling):**
 - **Redis:** (Add when scaling to multiple servers)
-  - Matchmaking queues
-  - Active match state (when multi-server)
+  - Matchmaking queues (V1 uses in-memory queue)
+  - Active match state (V1 uses in-memory, Redis needed for multi-server)
   - Cross-server pub/sub coordination
   - Rate limiting
 
@@ -362,10 +362,11 @@ When concurrent players exceed single-server capacity:
 
 ### 7.4 Matchmaking Engine
 
-**Queue Management:**
-- In-memory queue for V1 (single server)
+**Queue Management (V1 - In-Memory):**
+- In-memory queue for V1 (single server, no Redis needed)
 - Players grouped by mode
 - FIFO queue with Elo-based pairing
+- Redis migration for V2+ when scaling to multiple servers
 
 **Matching Algorithm:**
 1. Player joins queue with current Elo rating
@@ -708,12 +709,12 @@ This in-memory state allows instant access during gameplay without database quer
 
 ---
 
-### Phase 4: Matchmaking System (Week 7)
+### Phase 4: Matchmaking System (Week 7) - V1 CORE FEATURE
 
 **Goal:** Build automatic matchmaking and friend challenges
 
 **Backend:**
-- Implement in-memory matchmaking queue
+- Implement in-memory matchmaking queue (no Redis needed for V1)
 - Build Elo-based pairing algorithm
 - Create expanding search window logic (±50 Elo, +50 every 10s)
 - Add 2-minute timeout with "no matches" response
